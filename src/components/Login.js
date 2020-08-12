@@ -1,67 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
 
-function Login(props) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+class Login extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      username: "",
+      password: "",
+    };
+  }
 
-    const handleUsername = e => {
-        setUsername(e.target.value);
-        console.log(username);
-    }
+  handleOnChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  };
 
-    const handlePassword = e => {
-        setPassword(e.target.value);
-        console.log(password);
-    }
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const reqObj = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(this.state),
+    };
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch('http://localhost:3001/auto_login', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            .then(r => r.json())
-            .then(data => {
-                setUsername(data.username);
-                setPassword(data.password);
-            })
-        }
-    })
+    fetch("http://localhost:3001/login", reqObj)
+      .then((resp) => resp.json())
+      .then((playerData) => {
+        const player = playerData.player;
+        localStorage.setItem("token", playerData.token);
+        this.props.handleLogin(player);
+        this.props.history.push("/home");
+      })
+      .catch((err) => console.log(err));
+  };
 
-    const handleSubmit = e => {
-        e.preventDefault();
-        fetch('http://localhost:3001/login', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password_digest: password })
-        })
-        .then(r => r.json())
-        .then(data => {
-            localStorage.setItem('token', data.jwt);
-            props.handleLogin(data.user);
-        })
-        setUsername('');
-        setPassword('');
-    }
+  // useEffect(() => {
+  //     const token = localStorage.getItem('token');
+  //     if (token) {
+  //         fetch('http://localhost:3001/auto_login', {
+  //             headers: {
+  //                 Authorization: `Bearer ${token}`
+  //             }
+  //         })
+  //         .then(r => r.json())
+  //         .then(data => {
+  //             setUsername(data.username);
+  //             setPassword(data.password);
+  //         })
+  //     }
+  // })
 
+  render() {
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <h1>Welcome to Poker</h1>
-                <label>Username </label>
-                <input onChange={handleUsername} type='text' name='username'></input><br/>
-                <label>Password </label>
-                <input onChange={handlePassword} type='password' name='password_digest'></input><br/>
-                <input type='submit' value='Log In' />
-            </form>
-        </div>
-    )
-
+      <div>
+        <form onSubmit={(e) => this.handleSubmit(e)}>
+          <h1>Welcome to Poker</h1>
+          <label>Username </label>
+          <input
+            onChange={(e) => this.handleOnChange(e)}
+            value={this.state.username}
+            type="text"
+            name="username"
+          ></input>
+          <br />
+          <label>Password </label>
+          <input
+            onChange={(e) => this.handleOnChange(e)}
+            value={this.state.password}
+            type="password"
+            name="password"
+          ></input>
+          <br />
+          <input type="submit" value="Log In" />
+        </form>
+      </div>
+    );
+  }
 }
 
 export default Login;
