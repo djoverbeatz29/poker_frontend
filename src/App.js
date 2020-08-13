@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import GameCenter from "./components/GameCenter";
 import Login from "./components/Login";
+import SignUp from './components/SignUp'
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 class App extends React.Component {
@@ -32,9 +33,15 @@ class App extends React.Component {
               )}
             />
             <Route
-              path="/home"
+              path="/signup"
               render={(props) => (
-                <GameCenter {...props} playerIds={[1, 2, 3, 4, 5]} />
+                <SignUp {...props} handleLogin={this.handleSignUp} />
+              )}
+            />
+            <Route
+              path="/gamecenter"
+              render={(props) => (
+                <GameCenter {...props} player={this.state.player}/>
               )}
             />
           </Switch>

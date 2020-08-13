@@ -21,19 +21,20 @@ class Login extends React.Component {
     const reqObj = {
       method: "POST",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(this.state),
     };
-
+    console.log('Logging in', reqObj);
     fetch("http://localhost:3001/login", reqObj)
       .then((resp) => resp.json())
       .then((playerData) => {
+        console.log(playerData);
         const player = playerData.player;
         localStorage.setItem("token", playerData.token);
         this.props.handleLogin(player);
-        this.props.history.push("/home");
+        this.props.history.push("/gamecenter");
       })
       .catch((err) => console.log(err));
   };

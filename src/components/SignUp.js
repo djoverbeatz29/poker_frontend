@@ -31,10 +31,10 @@ class SignUp extends React.Component {
             body: JSON.stringify(this.state)
         })
         .then(r => r.json())
-        .then(data => {
-            localStorage.setItem('token', data.jwt);
-            this.props.handleLogin(player);
-            this.history.push(player);
+        .then(playerData => {
+            localStorage.setItem('token', playerData.jwt);
+            this.props.handleSignUp(playerData);
+            this.history.push(playerData);
             this.setState({
                 first_name: '',
                 last_name: '',
@@ -55,14 +55,14 @@ class SignUp extends React.Component {
                     <input type='text' name='first_name'></input><br/>
                     <label>Last Name </label>
                     <input type='text' name='last_name'></input><br/>
-                    <label>Username </label>
+                    <label>Email </label>
+                    <input type='text' name='email'></input><br/>
                     <label>Username </label>
                     <input type='text' name='username'></input><br/>
                     <label>Password </label>
-                    <input type='password' name='password_digest'></input><br/>
-                    <input type='text' name='username'></input><br/>
-                    <label>Password </label>
-                    <input type='password' name='password_digest'></input><br/>
+                    <input type='password' name='password'></input><br/>
+                    <label>Confirm Password </label>
+                    <input type='password' name='password_confirm'></input><br/>
                     <input type='submit' value='Log In' />
                 </form>
             </div>
@@ -71,4 +71,4 @@ class SignUp extends React.Component {
 
 }
 
-export default Login;
+export default SignUp;

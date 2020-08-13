@@ -5,32 +5,33 @@ class GameCenter extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            player: this.props.player,
             players: []
         }
     }
 
-    componentDidMount() {
-        for (const id of this.props.playerIds) {
-            fetch(`http://localhost:3001/players/${id}`)
-            .then(r=>r.json())
-            .then(player=>{
-                console.log(`Getting Player #${id}`);
-                player.hand = [];
-                this.setState(prevState => {
-                    return {
-                        players: [...prevState.players, player]
-                    }
-                })
-            })
-        }
-    }
+    // componentDidMount() {
+    //     for (const id of [2,3,4]) {
+    //         fetch(`http://localhost:3001/players/${id}`)
+    //         .then(r=>r.json())
+    //         .then(player=>{
+    //             console.log(`Getting Player #${id}`);
+    //             player.hand = [];
+    //             this.setState(prevState => {
+    //                 return {
+    //                     players: [...prevState.players, player]
+    //                 }
+    //             })
+    //         })
+    //     }
+    // }
 
     handleChoice = e => {
         console.log(e.target.innerText);
     }
 
     render() {
-        console.log(this.state.players);
+        console.log(this.state);
         return (
             <div>
                 <h1>Welcome to Poker!</h1>
