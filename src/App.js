@@ -13,6 +13,7 @@ class App extends React.Component {
     };
   }
 
+
   handleLogin = (player) => {
     this.setState({
       player: player,
