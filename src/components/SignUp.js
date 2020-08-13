@@ -1,11 +1,15 @@
 import React from 'react';
 
-class Login extends React.Component {
+class SignUp extends React.Component {
     constructor() {
         super()
         this.state = {
+            first_name: '',
+            last_name: '',
+            email: '',
             username: '',
-            password_digest: '',
+            password: '',
+            password_confirm: ''
         }
     }
 
@@ -18,7 +22,7 @@ class Login extends React.Component {
 
     handleSubmit = e => {
         e.preventDefault();
-        fetch('http://localhost:3001/login', {
+        fetch('http://localhost:3001/players', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -27,13 +31,17 @@ class Login extends React.Component {
             body: JSON.stringify(this.state)
         })
         .then(r => r.json())
-        .then(player => {
-            localStorage.setItem('token', player.jwt);
+        .then(data => {
+            localStorage.setItem('token', data.jwt);
             this.props.handleLogin(player);
             this.history.push(player);
             this.setState({
+                first_name: '',
+                last_name: '',
+                email: '',
                 username: '',
-                password_digest: ''
+                password: '',
+                password_confirm: ''
             })
         })
     }
@@ -42,8 +50,16 @@ class Login extends React.Component {
         return (
             <div>
                 <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
-                    <h1>Welcome to Poker</h1>
+                    <h1>Create a New Profile</h1>
+                    <label>First Name </label>
+                    <input type='text' name='first_name'></input><br/>
+                    <label>Last Name </label>
+                    <input type='text' name='last_name'></input><br/>
                     <label>Username </label>
+                    <label>Username </label>
+                    <input type='text' name='username'></input><br/>
+                    <label>Password </label>
+                    <input type='password' name='password_digest'></input><br/>
                     <input type='text' name='username'></input><br/>
                     <label>Password </label>
                     <input type='password' name='password_digest'></input><br/>
