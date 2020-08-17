@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import GameCenter from "./components/GameCenter";
 import Login from "./components/Login";
-import SignUp from './components/SignUp'
+import SignUp from './components/SignUp';
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 class App extends React.Component {
@@ -15,7 +15,9 @@ class App extends React.Component {
   }
 
 
-  handleLogin = (player) => {
+  handleLogin = player => {
+    player.gameId = 0;
+    player.isHuman = true;
     this.setState({
       player: player,
     });
@@ -26,24 +28,9 @@ class App extends React.Component {
       <div className="App">
         <BrowserRouter>
           <Switch>
-            <Route
-              path="/login"
-              render={(props) => (
-                <Login {...props} handleLogin={this.handleLogin} />
-              )}
-            />
-            <Route
-              path="/signup"
-              render={(props) => (
-                <SignUp {...props} handleLogin={this.handleSignUp} />
-              )}
-            />
-            <Route
-              path="/gamecenter"
-              render={(props) => (
-                <GameCenter {...props} player={this.state.player}/>
-              )}
-            />
+            <Route path="/login" component={Login} />
+            <Route path="/signup" component={SignUp} />
+            <Route path="/gamecenter" render={props => <GameCenter player={this.state.player} />} />
           </Switch>
         </BrowserRouter>
       </div>

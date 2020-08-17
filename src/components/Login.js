@@ -1,4 +1,3 @@
-
 import React from "react";
 
 class Login extends React.Component {
@@ -10,13 +9,13 @@ class Login extends React.Component {
     };
   }
 
-  handleOnChange = (e) => {
+  handleChange = e => {
     this.setState({
       [e.target.name]: e.target.value,
     });
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
     const reqObj = {
       method: "POST",
@@ -26,55 +25,28 @@ class Login extends React.Component {
       },
       body: JSON.stringify(this.state),
     };
-    console.log('Logging in', reqObj);
     fetch("http://localhost:3001/login", reqObj)
-      .then((resp) => resp.json())
-      .then((playerData) => {
+    .then(r => r.json())
+    .then(playerData => {
         console.log(playerData);
         const player = playerData.player;
         localStorage.setItem("token", playerData.token);
         this.props.handleLogin(player);
         this.props.history.push("/gamecenter");
       })
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   };
-
-  // useEffect(() => {
-  //     const token = localStorage.getItem('token');
-  //     if (token) {
-  //         fetch('http://localhost:3001/auto_login', {
-  //             headers: {
-  //                 Authorization: `Bearer ${token}`
-  //             }
-  //         })
-  //         .then(r => r.json())
-  //         .then(data => {
-  //             setUsername(data.username);
-  //             setPassword(data.password);
-  //         })
-  //     }
-  // })
 
   render() {
     return (
       <div>
-        <form onSubmit={(e) => this.handleSubmit(e)}>
+        <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
           <h1>Welcome to Poker</h1>
           <label>Username </label>
-          <input
-            onChange={(e) => this.handleOnChange(e)}
-            value={this.state.username}
-            type="text"
-            name="username"
-          ></input>
+          <input type="text" name="username"></input>
           <br />
           <label>Password </label>
-          <input
-            onChange={(e) => this.handleOnChange(e)}
-            value={this.state.password}
-            type="password"
-            name="password"
-          ></input>
+          <input type="password" name="password"></input>
           <br />
           <input type="submit" value="Log In" />
         </form>
