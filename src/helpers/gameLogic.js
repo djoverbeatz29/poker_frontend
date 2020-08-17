@@ -1,10 +1,6 @@
-import './handLogic';
-import './constants';
+import { HAND_RANKS, RANK_VAL_MAP, SUITS, RANKS } from './constants';
 
-
-
-
-class Deck {
+export class Deck {
     constructor() {
         this.cards = [];
         for (const suit of SUITS) { 
@@ -26,7 +22,7 @@ class Deck {
     }
 }
 
-class Card {
+export class Card {
     constructor(rank, suit) {
         this.rank = rank;
         this.suit = suit;

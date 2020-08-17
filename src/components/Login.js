@@ -28,8 +28,8 @@ class Login extends React.Component {
     fetch("http://localhost:3001/login", reqObj)
     .then(r => r.json())
     .then(playerData => {
-        console.log(playerData);
         const player = playerData.player;
+        console.log(player);
         localStorage.setItem("token", playerData.token);
         this.props.handleLogin(player);
         this.props.history.push("/gamecenter");

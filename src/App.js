@@ -28,9 +28,9 @@ class App extends React.Component {
       <div className="App">
         <BrowserRouter>
           <Switch>
-            <Route path="/login" component={Login} />
+            <Route path="/login" render={props => <Login {...props} handleLogin={this.handleLogin} /> } />
             <Route path="/signup" component={SignUp} />
-            <Route path="/gamecenter" render={props => <GameCenter player={this.state.player} />} />
+            <Route path="/gamecenter" render={props => <GameCenter {...props} handleLogin={this.handleLogin} player={this.state.player} />} />
           </Switch>
         </BrowserRouter>
       </div>
