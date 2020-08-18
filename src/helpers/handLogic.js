@@ -1,6 +1,4 @@
 import {Card, Deck} from './gameLogic';
-import { HAND_RANKS, RANK_VAL_MAP, SUITS, RANKS } from './constants';
-import {dupeGetter, straightGetter, flushGetter, straightFlushGetter, handGetter} from './handLogic';
 
 export function dupeGetter(hand) {
     hand = hand.sort((a,b)=>a.value>b.value?1:-1)
