@@ -4,6 +4,7 @@ class Login extends React.Component {
   constructor() {
     super();
     this.state = {
+      error: "",
       username: "",
       password: "",
     };
@@ -29,12 +30,15 @@ class Login extends React.Component {
     .then(r => r.json())
     .then(playerData => {
         const player = playerData.player;
-        console.log(player);
         localStorage.setItem("token", playerData.token);
         this.props.handleLogin(player);
         this.props.history.push("/gamecenter");
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        this.setState({
+          error: "Invalid login. Try again."
+        })
+      });
   };
 
   render() {
@@ -42,6 +46,7 @@ class Login extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
           <h1>Welcome to Poker</h1>
+          <h2>{this.state.error}</h2>
           <label>Username </label>
           <input type="text" name="username"></input>
           <br />

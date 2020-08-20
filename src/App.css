@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.player-info-holder {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 50% 50%;
+}
+
+.comm-card-holder img {
+  max-height: 175px;
+}
+
+.player-info img {
+  max-height: 175px;
+}

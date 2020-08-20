@@ -1,4 +1,4 @@
-import { HAND_RANKS, RANK_VAL_MAP, SUITS, RANKS } from './constants';
+import { RANK_VAL_MAP, SUITS, RANKS } from './constants';
 
 export class Deck {
     constructor() {
@@ -20,6 +20,7 @@ export class Deck {
     dealCard() {
         return this.cards.shift();
     }
+    
 }
 
 export class Card {
@@ -29,6 +30,10 @@ export class Card {
         this.value = RANK_VAL_MAP[rank];
         this.code = `${rank}${suit[0]}`;
         this.isVisible = false;
+    }
+
+    showImage() {
+        return this.isVisible ? require(`../images/${this.rank}${this.suit[0]}.png`) : require('../images/Back.jpg');
     }
 
 }

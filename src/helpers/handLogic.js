@@ -1,4 +1,4 @@
-import {Card, Deck} from './gameLogic';
+import { HAND_RANKS } from './constants';
 
 export function dupeGetter(hand) {
     hand = hand.sort((a,b)=>a.value>b.value?1:-1)
@@ -13,13 +13,13 @@ export function dupeGetter(hand) {
 
     const maxFreq = Math.max(...Object.values(freqs));
 
-    for (freq of Object.values(freqs)) {
+    for (const freq of Object.values(freqs)) {
         freqGroups[freq] = [];
     }
 
     for (const card of hand) {
         freqGroups[freqs[card.rank]].push(card);
-        if (freqs[card.rank] != maxFreq) {
+        if (freqs[card.rank] !== maxFreq) {
             extras.push(card);
         }
     }
@@ -44,8 +44,10 @@ export function dupeGetter(hand) {
         else {
             rez.type = 'Three of a Kind';
             rez.cards = {
-                1: freqGroups[3].slice(freqGroups[3].length - 3, freqGroups[3].length),
-                2: extras.slice(extras.length - 2, extras.length)
+                1: freqGroups[3].slice(freqGroups[3].length - 3, freqGroups[3].length)
+            }
+            for (const i of [0,1]) {
+                rez.cards[i+2] = [extras[extras.length - 1 - i]];
             }
         }
     }
@@ -61,14 +63,18 @@ export function dupeGetter(hand) {
         else {
             rez.type = 'Pair';
             rez.cards = {
-                1: freqGroups[2],
-                2: extras.slice(extras.length - 3, extras.length)
+                1: freqGroups[2]
             };
+            for (const i of [0,1,2]) {
+                rez.cards[i+2] = [extras[extras.length - 1 - i]];
+            }
         }
     }
     else {
         rez.type = 'High Card';
-        rez.cards = freqGroups[1].slice(freqGroups[1].length - 5, freqGroups[1].length);
+        for (const i of [0,1,2,3,4]) {
+            rez.cards[i+1] = [freqGroups[1][freqGroups[1].length - 1 - i]];
+        }
     }
     return rez;
 }
@@ -113,21 +119,31 @@ export function straightGetter(hand) {
 
 export function straightFlushGetter(hand) {
     const flushCards = flushGetter(hand);
+    const cardsOb = {};
     if (flushCards) {
         const straightFlushCards = straightGetter(flushCards);
         if (straightFlushCards) {
             const cards = straightFlushCards.end;
-            return {type: 'Straight Flush', cards: {1: cards.slice(cards.length - 5, cards.length)}};
+            for (let i = 1; i <= 5; i++) {
+                cardsOb[i] = [cards[cards.length-i]];
+            }
+            return {type: 'Straight Flush', cards: cardsOb};
         }
         else {
-            return {type: 'Flush', cards: {1: flushCards.slice(flushCards.length - 5, flushCards.length)}};
+            for (let i = 1; i <= 5; i++) {
+                cardsOb[i] = [flushCards[flushCards.length-i]];
+            }
+            return {type: 'Flush', cards: cardsOb};
         }
     }
     else {
-        straightCards = straightGetter(hand);
+        const straightCards = straightGetter(hand);
         if (straightCards) {
             const cards = straightCards.end;
-            return {type: 'Straight', cards: {1: cards.slice(cards.length - 5, cards.length)}};
+            for (let i = 1; i <= 5; i++) {
+                cardsOb[i] = [cards[cards.length-i]];
+            }
+            return {type: 'Straight', cards: cardsOb};
         }
         else {
             return {type: 'Null'};

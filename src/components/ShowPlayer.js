@@ -9,13 +9,13 @@ class ShowPlayer extends React.Component {
     }
 
     render() {
-        const {username, game_balance, amount_bet} = this.state;
+        const {username, game_balance, amount_bet, hand} = this.state;
         return (
             <div>
-                <h1>{username}</h1>
+                <h2>{username}</h2>
                 <h2>{game_balance}</h2>
                 <h2>{amount_bet}</h2>
-                {/* {this.state.hand.map(card => <img src={`../../public/images/photos/${card.isVisible ? card.code : 'Back'}`} alt='' />)} */}
+                {hand && hand.map(card => <img src={card.image} alt='' />)}
             </div>
         )
     }

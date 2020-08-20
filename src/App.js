@@ -14,7 +14,6 @@ class App extends React.Component {
     };
   }
 
-
   handleLogin = player => {
     player.gameId = 0;
     player.isHuman = true;
