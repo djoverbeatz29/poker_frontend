@@ -41,6 +41,13 @@ export function dupeGetter(hand) {
                 2: freqGroups[2].slice(freqGroups[2].length - 2, freqGroups[2].length)
             };
         }
+        else if (freqGroups[3].length === 6) {
+            rez.type = 'Full House';
+            rez.cards = {
+                1: freqGroups[3].slice(freqGroups[3].length - 3, freqGroups[3].length),
+                2: freqGroups[3].slice(freqGroups[3].length - 5, freqGroups[3].length - 3)
+            }
+        }
         else {
             rez.type = 'Three of a Kind';
             rez.cards = {
@@ -95,25 +102,35 @@ export function flushGetter(hand) {
 }
 
 export function straightGetter(hand) {
+    const ranks = hand.map(c => c.rank);
+    if (ranks.includes('2') && ranks.includes('3') && ranks.includes('4') && ranks.includes('5') && ranks.includes('A')) {
+        const ace = hand.find(c => c.rank === 'A');
+        ace.value = 0;
+    }
     hand = hand.sort((a,b)=>parseInt(a.value)>parseInt(b.value) ? 1 : -1);
     const vals = {end: [hand[0]], len: 1};
     let currStreak = 1;
     let currEnd = 0;
     for (let i = 1; i < hand.length; i++) {
-        if (hand[i].value === hand[i-1].value + 1) {
+        if ((hand[i].value === hand[i-1].value + 1) || (hand[i].value === hand[i-1].value)) {
             currStreak++;
             if (currStreak >= vals.len) {
                 vals.len = currStreak;
                 currEnd = i;
             }
         }
-        else if (hand[i].value === hand[i-1].value) {
-        }
         else {
             currStreak = 1;
         }
     }
     vals.end = hand.slice(currEnd - vals.len + 1, currEnd + 1);
+    for (let i = 1; i < vals.end.length; i++) {
+        if (vals.end[i].value === vals.end[i-1].value) {
+            vals.end[i-1] = null;
+        }
+    }
+    vals.end = vals.end.filter(card => card);
+    vals.len = vals.end.length;
     return vals.len >= 5 ? vals : null;
 }
 

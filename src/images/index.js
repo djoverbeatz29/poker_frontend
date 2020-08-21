@@ -8,7 +8,5 @@ for (const suit of SUITS) {
     }
 }
 images['Back'] = require('./Back.jpg');
-images['Button'] = require('./Button.jpg');
-images['Turn'] = require('./Turn.png');
 
 export default images;

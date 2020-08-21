@@ -3,7 +3,7 @@ import "./App.css";
 import GameCenter from "./components/GameCenter";
 import Login from "./components/Login";
 import SignUp from './components/SignUp';
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, } from "react-router-dom";
 
 class App extends React.Component {
   constructor() {

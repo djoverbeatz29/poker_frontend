@@ -1,8 +1,8 @@
 import React from 'react';
-// import ShowPlayer from './ShowPlayer';
 import { Deck } from '../helpers/gameLogic';
 import { handGetter } from '../helpers/handLogic';
 import images from '../images/index';
+// import NumericInput from 'react-numeric-input';
 
 class GameCenter extends React.Component {
     constructor(props) {
@@ -50,7 +50,8 @@ class GameCenter extends React.Component {
                 this.setState(prev => {
                     return {
                         players: [playerData],
-                        avail_players: [playerData.gameId]}
+                        avail_players: [playerData]
+                    }
                 })
             })
             .catch(err => console.log(err))
@@ -66,7 +67,7 @@ class GameCenter extends React.Component {
                     this.setState(prevState => {
                         return {
                             players: [...prevState.players, player],
-                            avail_players: [...prevState.avail_players, player.gameId]
+                            avail_players: [...prevState.avail_players, player]
                         }
                     })
                 })
@@ -87,15 +88,15 @@ class GameCenter extends React.Component {
                         {username} - ${amount_bet}
                     </h3>
                     <h3>Bank: ${game_balance}</h3>
-                    {hand.map(card => this.renderCard(card))}
+                    {hand.map((card, i) => this.renderCard(card, i))}
                     {player.bestHand && <h3>{player.bestHand.type}</h3>}
                 </div>
             )
         }
     }
 
-    renderCard = card => {
-        return <img src={card.isVisible ? card.image : images['Back']} alt='' />;
+    renderCard = (card, i) => {
+        return <img key={i} src={card.isVisible ? card.image : images['Back']} alt='' />;
     }
 
     getCurrentPlayer = () => {
@@ -137,8 +138,10 @@ class GameCenter extends React.Component {
     }
 
     turnChecker = () => {
-        const playerBets = this.state.avail_players.map(i => this.state.players[i].amount_bet);
-        if ((this.state.current_game_id === (this.state.button + 2) % this.state.players.length) && (this.state.cycle > 0) && (playerBets.find(b => b!==this.state.max_bet) === undefined)) {
+        const playerBets = this.state.avail_players.map(player => player.amount_bet);
+        const cond1 = this.state.cycle >= this.state.players.length + 1;
+        const cond2 = playerBets.find(b => b!==this.state.max_bet) === undefined;
+        if (cond1 && cond2) {
             this.setState(prev => {
                 return {
                     turn: prev.turn + 1,
@@ -172,9 +175,11 @@ class GameCenter extends React.Component {
             const diff = parseInt(this.state.max_bet - player.amount_bet);
             player.amount_bet += diff;
             player.game_balance -= diff;
-            this.state.pool += diff;
-            this.setState({
-                dialog: `${player.username} calls.`
+            this.setState(prev => {
+                return {
+                    pool: prev.pool + diff,
+                    dialog: `${player.username} calls.`
+                }
             })
         }
         else {
@@ -186,39 +191,34 @@ class GameCenter extends React.Component {
     }
 
     makeTurn = () => {
-        const player = this.getCurrentPlayer();
-        if (!player.isHuman) {
-            setTimeout(this.botTurn(player), 1000);
+        if (!this.state.over) {
+            const player = this.getCurrentPlayer();
+            if (!player.isHuman) {
+                this.botTurn(player);
+            }
+            else {
+                this.setState({
+                    dialog: `${player.username}, make your turn!`
+                })
+            }
         }
-        else {
-            this.setState({
-                dialog: `${player.username}, make your turn!`
-            })
-        }
-        console.log(this.state);
     }
 
     nextPlayer = () => {
-        const nextId = (this.state.current_game_id + 1) % this.state.players.length; 
         this.setState(prev => {
             return {
-                avail_players: prev.avail_players.filter(i => this.state.players[i].isIn),
-                current_game_id: nextId,
+                avail_players: prev.avail_players.filter(player => player.isIn),
+                current_game_id: (prev.current_game_id + 1) % prev.players.length,
+                cycle: prev.cycle + 1
             }
         })
-        if (this.state.current_game_id === (this.state.button + 1) % this.state.players.length) {
-            this.setState(prev => {
-                return {
-                    cycle: prev.cycle + 1
-                }
-            })
-        }
         this.turnChecker();
     }
 
     handleBet = e => {
+        const val = parseInt(e.target.value);
         this.setState({
-            raise_amount: parseInt(e.target.value) || 0
+            raise_amount: val >= 0 ? val : 0
         })
     }
 
@@ -238,12 +238,15 @@ class GameCenter extends React.Component {
                 }
                 else {
                     const diff = (this.state.raise_amount + this.state.max_bet) - player.amount_bet;
-                    this.state.max_bet += this.state.raise_amount;
                     player.amount_bet += diff;
                     player.game_balance -= diff;
-                    this.state.pool += diff;
-                    this.setState({
-                        dialog: `You raised by $${this.state.raise_amount} to $${this.state.max_bet}!`
+                    this.setState(prev => {
+                        return {
+                            max_bet: prev.max_bet + prev.raise_amount,
+                            pool: prev.pool + diff,
+                            dialog: `You raised by $${this.state.raise_amount} to $${this.state.max_bet}!`,
+                            raise_amount: 0
+                        }
                     })
                 }
             }
@@ -251,24 +254,25 @@ class GameCenter extends React.Component {
                 const diff = this.state.max_bet - player.amount_bet;
                 player.amount_bet += diff;
                 player.game_balance -= diff;
-                this.state.pool += diff;
-                this.setState({
-                    dialog: 'You called.'
+                this.setState(prev => {
+                    return {
+                        pool: prev.pool + diff,
+                        dialog: 'You called.'
+                    }
                 })
             }
             else if (e.target.value === 'Fold') {
                 player.isIn = false;
                 this.setState(prev => {
                     return {
-                        ...prev,
                         dialog: `You folded. Remaining players: ${this.state.avail_players.map(i=>this.state.players[i].username).join(', ')}`,
-                        avail_players: prev.avail_players.map(i => i !== this.state.current_game_id)
+                        avail_players: prev.avail_players.map(player => player.isIn)
                     }
                 })
             }
             else if (e.target.value === 'Check') {
                 this.setState({
-                    dialog: `${player.username} checks.`
+                    dialog: `${player.username} checks.`,
                 })
             }
             this.nextPlayer();
@@ -320,9 +324,10 @@ class GameCenter extends React.Component {
             }
         }
         this.setState({
-            dialog: `The winner${winners.length > 1 ? 's are' : ' is'}, with a ${winners[0].bestHand.type}: ${winners.map(w=>w.username).join(', ')}!`
+            dialog: `The ${winners.length > 1 ? 'co-winners are' : 'winner is'}, with a ${winners[0].bestHand.type}: ${winners.map(w=>w.username).join(', ')}!`
         })
         for (const winner of winners) {
+            winner.bestHand.type += " - Winner!";
             const winnings = parseFloat(this.state.pool / winners.length);
             winner.game_balance += winnings;
         }
@@ -340,11 +345,12 @@ class GameCenter extends React.Component {
                 min_bet: 5,
                 max_bet: 0,
                 comm_cards: [],
-                avail_players: prev.players.map(p => p.gameId),
+                avail_players: prev.players,
                 started: false,
                 over: false,
                 raise_amount: 0,
-                turn: 0        
+                turn: 0,
+                cycle: 0
             }
         })
         for (const player of this.state.players) {
@@ -358,11 +364,12 @@ class GameCenter extends React.Component {
 
     startGame = () => {
         this.dealCards();
-        // while (!this.state.over) {
-        //     this.makeTurn();
-        //     this.turnChecker();
-        // }
-        // this.handComp();
+        let timeout = setInterval(() => {
+            if (this.state.over) {
+                clearInterval(timeout);
+            }
+            this.makeTurn();
+        }, 1500)
     }
 
     newGame = () => {
@@ -377,9 +384,8 @@ class GameCenter extends React.Component {
                 <h2>{this.state.errors}</h2>
                 {this.state && <h2>Pool: ${this.state.pool}</h2>}
                 <div className='comm-card-holder'>
-                    {(this.state.comm_cards || []).map(card => this.renderCard(card))}
+                    {(this.state.comm_cards || []).map((card, i) => this.renderCard(card, i))}
                 </div>
-                <h3>Opponents</h3>
                 <div className='player-info-holder'>
                     {this.state.players.slice(1, this.state.players.length).map(player => this.renderPlayer(player.gameId))}
                 </div>
@@ -387,7 +393,6 @@ class GameCenter extends React.Component {
                     { this.renderPlayer(0) }
                 </div>
                 {!this.state.started && <button onClick={this.startGame}>Start Game</button>}
-                {this.state.started && !this.state.over && !this.getCurrentPlayer().isHuman && <button onClick={this.makeTurn}>Make Turn</button>}
                 {this.state.over && <button onClick={this.newGame}>New Game</button>}
                 {this.state.started && this.state.current_game_id === 0 && !this.state.over &&
                     <div onClick={this.humanTurn} className='turn-option-holder'>
@@ -397,7 +402,7 @@ class GameCenter extends React.Component {
                         <input type='submit' value='Call' />}
                     {(this.state.players[0] || {}).amount_bet < this.state.max_bet &&
                         <input type='submit' value='Fold' />}                                                
-                    <input onChange={this.handleBet} type='text' name='bet_amount'></input>
+                    <input onChange={this.handleBet} type='number' name='raise_amount' value={this.state.raise_amount}></input>
                     <input type='submit' value='Raise' />  
                 </div>}
             </div>
