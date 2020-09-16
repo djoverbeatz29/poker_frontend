@@ -22,8 +22,6 @@ Throughout the round, each player's current bet and overall account balance (i.e
 
 After each round, the winner(s) gets their share of the pot added to their balance, and the next game begins.
 
-Standard Hold 'Em rules apply
-
 # YouTube Demo
 Here is a brief demo showing off an early version of the App. More to come!
 https://youtu.be/gCqOxp0iujw
